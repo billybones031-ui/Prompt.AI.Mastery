@@ -1,0 +1,499 @@
+# AI Mastery Guidebook (2026)
+
+High-level systems, structures, and patterns for expert use of large language models and agentic artificial intelligence systems.
+
+No beginner material. This guide assumes you already know what large language models, application programming interfaces, and basic prompts are. The focus is on how to structure, verify, and govern powerful systems.
+
+---
+
+## Chapter 1. Mental Model for High-Level AI Use
+
+### 1.1 The Three Layers of an AI System
+
+At high level, every serious artificial intelligence application has three layers:
+
+1. **Reasoning layer** â€“ the modelâ€™s internal thinking steps and how you shape them.
+2. **Control layer** â€“ prompts, instructions, and system messages that constrain behavior.
+3. **Assurance layer** â€“ verification, monitoring, and guardrails that detect and limit failure.
+
+Prompt formatting, Chain-of-Verification, and advanced guardrails live across all three layers. You are not writing â€œclever prompts.â€ You are designing a control and assurance system around a non-deterministic reasoner.
+
+### 1.2 Principles for Master-Level Prompting
+
+1. **Structure over style** â€“ The layout of information (sections, tags, schemas) matters more than fancy wording.
+2. **Explicit contracts** â€“ Every prompt defines a contract: allowed inputs, required outputs, and failure handling.
+3. **Verification first** â€“ Assume the first answer may be wrong. Design verification into the process, not as an afterthought.
+4. **Task- and model-dependence** â€“ All performance gains are specific to your task, model, and data. You must measure.
+5. **Risk-based complexity** â€“ Use simple flows for low-risk queries, and heavy verification only when risk justifies latency and cost.
+
+---
+
+## Chapter 2. Advanced Prompt Formatting and Structure
+
+This chapter covers structures that are standard in 2025â€“2026 high-level applications: XML-style tags, JavaScript Object Notation schemas, reasoning effort control, and modular prompt components.
+
+### 2.1 Structured Prompting with XML-Style Tags
+
+Structured prompting wraps role, task, constraints, and output in explicit tags. This increases clarity, enables reliable parsing, and simplifies downstream automation.
+
+Research and applied reports show that formatting alone can change model performance by up to about forty percent, and structured schemas can reduce output errors by as much as sixty percent in some business workflows. The exact gain depends strongly on the task, model, and how well you design the templates.
+
+**Generic structure**
+
+<role>Expert [domain]</role>
+<context>[relevant background, data, constraints]</context>
+<task>[what must be solved or produced]</task>
+<process>[steps the model must follow]</process>
+<output_format>[exact shape of the answer]</output_format>
+
+You can use angle brackets or any clear token pair; the key is consistent, machine-readable structure.
+
+#### 2.1.1 Example â€“ Financial Scenario Analysis
+
+<role>Senior financial analyst</role>
+<context>
+Company: [insert company profile or summary]
+Time horizon: 12 months
+</context>
+<task>
+Evaluate three revenue scenarios (conservative, expected, aggressive) and describe main drivers.
+</task>
+<process>
+1. Extract key revenue drivers from the context.
+2. Define assumptions for each scenario.
+3. Quantify approximate revenue ranges.
+4. Explain the main risks and upside factors.
+</process>
+<output_format>
+Return a table with columns: Scenario, RevenueRange, KeyAssumptions, MainRisks.
+Then provide a short narrative justification (max 300 words).
+</output_format>
+
+#### 2.1.2 Example â€“ Code Review at Scale
+
+<role>Principal software engineer</role>
+<context>
+Programming language: Python
+Code quality goal: High performance and scalability under heavy concurrent load.
+</context>
+<task>
+Review the following function and identify only issues that could affect scalability, concurrency, or performance.
+</task>
+<process>
+1. Read the code.
+2. List possible bottlenecks and concurrency issues.
+3. Prioritize them by severity.
+4. Propose concrete refactorings.
+</process>
+<output_format>
+Return a list of issues. Each issue must have fields: Id, Description, Severity, SuggestedFix.
+</output_format>
+
+#### 2.1.3 Example â€“ Strategic Market Analysis
+
+<role>Strategy consultant</role>
+<context>
+Region: [insert region]
+Industry: [insert industry]
+Time frame: 18â€“24 months.
+</context>
+<task>
+Assess market attractiveness and identify the three most promising strategic moves.
+</task>
+<process>
+1. Evaluate market size, growth, and profitability.
+2. Analyze competition and barriers to entry.
+3. Identify three strategic options.
+4. Rank them by impact and feasibility.
+</process>
+<output_format>
+Return a table with columns: Option, ImpactScore1to10, FeasibilityScore1to10, KeyRisks.
+Then provide a short justification paragraph for the top option.
+</output_format>
+
+### 2.2 JSON and Schema-First Output Contracts
+
+When downstream services need to parse results, define a strict JavaScript Object Notation schema in the prompt. This treats the answer as a structured data object, not free text.
+
+**Generic schema contract**
+
+You are an expert [role].
+
+Task: [clearly defined objective].
+
+Always output valid JavaScript Object Notation that matches this schema:
+
+{
+  "fieldOne": string,
+  "fieldTwo": number,
+  "items": [
+    {
+      "name": string,
+      "score": number,
+      "notes": string
+    }
+  ]
+}
+
+Do not include any explanation outside the JavaScript Object Notation.
+
+#### 2.2.1 Example â€“ Lead Scoring
+
+You are a senior business development strategist.
+
+Task: Score these leads by quality and fit.
+
+Always output valid JavaScript Object Notation matching this schema:
+
+{
+  "leads": [
+    {
+      "name": string,
+      "fitScore": integer,
+      "urgency": "low" | "medium" | "high",
+      "reason": string
+    }
+  ]
+}
+
+Leads:
+[insert list]
+
+#### 2.2.2 Example â€“ Risk Register for a Project
+
+You are a risk manager for a software program.
+
+Task: Construct a risk register from the description.
+
+Output valid JavaScript Object Notation with this structure:
+
+{
+  "projectName": string,
+  "risks": [
+    {
+      "id": string,
+      "description": string,
+      "likelihood1to5": integer,
+      "impact1to5": integer,
+      "mitigationPlan": string
+    }
+  ]
+}
+
+Project description: [insert description]
+
+#### 2.2.3 Example â€“ Product Requirements Extraction
+
+You are a product manager.
+
+Task: Convert the following stakeholder conversation into structured product requirements.
+
+Output valid JavaScript Object Notation with this structure:
+
+{
+  "epics": [
+    {
+      "title": string,
+      "priority": "P0" | "P1" | "P2",
+      "userStories": [
+        {
+          "asA": string,
+          "iWant": string,
+          "soThat": string
+        }
+      ]
+    }
+  ]
+}
+
+Conversation:
+[insert transcript]
+
+### 2.3 Reasoning Effort Control
+
+Reasoning effort control directs how hard the model thinks. You explicitly choose shallow, medium, or deep reasoning and define what that means. This lets you balance latency and cost against accuracy and depth.
+
+**Generic structure**
+
+Use [low | medium | deep] reasoning effort.
+
+For low effort, perform a quick pattern match and give a short answer.
+For medium effort, follow three to five explicit steps.
+For deep effort, follow a full analytical workflow with self-checks.
+
+#### 2.3.1 Example â€“ Quick Lead Qualification (Low Effort)
+
+Use low reasoning effort.
+
+Task: Score whether each lead is worth a follow-up call.
+
+Process:
+1. Check industry, company size, and role.
+2. Compare to ideal customer profile.
+3. Output a score from 1 to 10 and one-sentence justification.
+
+#### 2.3.2 Example â€“ Business Case Review (Medium Effort)
+
+Use medium reasoning effort.
+
+Task: Evaluate this business case.
+
+Process:
+1. Summarize the proposal.
+2. List strengths and weaknesses.
+3. Estimate financial impact using ranges.
+4. Recommend proceed or do not proceed with reasoning.
+
+#### 2.3.3 Example â€“ Market Entry Strategy (Deep Effort)
+
+Use deep reasoning effort.
+
+Task: Assess whether to enter the given market in the next two years.
+
+Process:
+1. Analyze market size, growth, and profitability.
+2. Analyze competitive dynamics and differentiation.
+3. Run best-case, expected-case, and worst-case scenarios.
+4. Identify success and failure conditions.
+5. Summarize with a clear recommendation and confidence rating.
+
+---
+
+## Chapter 3. Safety Guardrails and Risk-Based Routing
+
+Safety guardrails are layered controls that prevent or mitigate harmful, non-compliant, or low-quality outcomes. In 2026, serious enterprise deployments treat guardrails as non-optional, especially in regulated or high-risk domains. Several jurisdictions, including California, now legally require runtime safeguards and disclosures for certain customer-facing conversational systems. In practice, most large organizations treat layered guardrails as mandatory even when law is still catching up.
+
+### 3.1 Defense-in-Depth Guardrail Pipeline
+
+A defense-in-depth pipeline adds multiple independent checks around the model. You combine light, fast filters with heavier verification for only the most critical cases.
+
+Typical stages:
+
+1. **Input validation** â€“ Sanitize and classify the user input.
+2. **Core generation with retrieval** â€“ Use the model with retrieval-augmented generation so answers are grounded in your data.
+3. **Self-critique and verification** â€“ The model or an external verifier checks the output for factuality, safety, and policy alignment.
+4. **Post-processing and redaction** â€“ Mask sensitive data, format output, and decide whether to return, revise, or escalate.
+
+#### 3.1.1 Example â€“ Customer Support Chatbot
+
+Pipeline:
+
+1. Input: Remove obvious sensitive data such as credit card numbers; classify intent as low, medium, or high risk.
+2. Generation: Use retrieval-augmented generation against a knowledge base of approved support articles.
+3. Verification: Run a second model pass to check tone, legal disclaimers, and whether any content contradicts the knowledge base.
+4. Post-processing: If high risk is detected (for example potential legal claim or regulatory issue), route the conversation and transcript to a human agent instead of answering directly.
+
+Prompt snippet for the verification step:
+
+You are a policy and accuracy checker for customer support.
+
+Task: Review the assistantâ€™s draft response.
+
+Process:
+1. Compare claims to the retrieved articles.
+2. Flag any unsupported statements.
+3. Check tone for politeness and clarity.
+4. Decide: safe_to_send or escalate_to_human, with reasons.
+
+### 3.2 Risk-Based Routing
+
+Risk-based routing sends different prompts through different paths depending on their risk level. This avoids wasting heavy verification on trivial queries while still protecting high stakes decisions.
+
+Risk can be defined by:
+
+- Domain (for example, health, finance, legal, safety-critical operations).
+- Impact (for example, potential money lost or users affected).
+- Regulatory and reputational exposure.
+
+#### 3.2.1 Example â€“ Contract Review Assistant
+
+1. Low risk: Simple non-disclosure agreement templates.
+   - Path: Single-pass model with light output filter.
+2. Medium risk: Standard commercial contracts.
+   - Path: Model plus self-critique and a checklist for key clauses.
+3. High risk: Large acquisitions or cross-border agreements.
+   - Path: Full legal team review, with the model limited to drafting and summarizing, not final advice.
+
+Prompt pattern for classification:
+
+You are a risk classifier for legal documents.
+
+Task: Classify the risk level of this request as low, medium, or high.
+
+Risk criteria:
+- High: Large financial stakes, cross-border issues, or regulatory uncertainty.
+- Medium: Standard commercial agreements with moderate financial impact.
+- Low: Simple template documents or internal agreements.
+
+Return JavaScript Object Notation:
+{
+  "riskLevel": "low" | "medium" | "high",
+  "reason": string
+}
+
+#### 3.2.2 Example â€“ Advertising and Targeting Prompts
+
+- Low risk: Generic brand voice or headline suggestions.
+- Medium risk: Targeting specific demographics for promotions.
+- High risk: Any content touching on sensitive attributes, discrimination, or regulated products.
+
+For medium and high risk, route the generated content through a policy-checking model plus a human reviewer.
+
+#### 3.2.3 Example â€“ Data Query Agent
+
+- Low risk: Read-only analytics and summarization of aggregate metrics.
+- Medium risk: Recommendations that could change configuration or budgets.
+- High risk: Actions that execute transactions or change security settings.
+
+Use the model only for low- and medium-risk read-only analysis. Require explicit multi-factor human approval for any high-risk action.
+
+---
+
+## Chapter 4. Chain-of-Verification (CoVe)
+
+Chain-of-Verification is a prompting strategy where the system generates an answer, then generates verification questions, then answers those questions independently, and finally revises the original answer based on any inconsistencies.
+
+Research on Chain-of-Verification shows that:
+
+- On some benchmarks, it can cut hallucinations roughly in half, with reported reductions of around fifty to seventy percent in certain settings.
+- On long-form factual tasks, it can increase factuality metrics by around twenty to thirty percentage points, for example from the mid-fifties to the low seventies on specific factuality scores.
+
+These are strong but task-specific results. Chain-of-Verification does not eliminate hallucinations and comes with increased cost and latency. Use it for high-risk or high-value tasks.
+
+### 4.1 Standard CoVe Loop
+
+The classic CoVe procedure has four stages:
+
+1. Generate an initial answer to the userâ€™s question.
+2. Generate a set of verification questions that, if answered correctly, would confirm or falsify key parts of the answer.
+3. Answer the verification questions independently, often using separate retrieval or tools.
+4. Compare the verification answers to the original answer and revise the answer if there is a mismatch.
+
+#### 4.1.1 CoVe Prompt Pattern
+
+You are an expert analyst.
+
+Step 1: Answer the userâ€™s question.
+
+Step 2: List three to seven verification questions whose answers would confirm or refute the main claims you made.
+
+Step 3: For each verification question, provide a separate answer, clearly separated from your original answer.
+
+Step 4: Compare your verification answers to your original answer. If there are contradictions or unsupported claims, revise your original answer and explain what changed.
+
+Return a final section titled "VerifiedAnswer" that reflects any corrections.
+
+#### 4.1.2 Example â€“ Market Entry Decision
+
+User question:
+Should we launch a handyman services business in Missoula, Montana in the next twelve months?
+
+CoVe verification questions might include:
+1. What is the current estimated market size for handyman and small repair services in Missoula?
+2. How many established competitors operate in that region?
+3. What are typical hourly rates and margins for similar services?
+4. Are there seasonal demand patterns that materially affect revenue?
+
+The system answers these using reliable data sources, then revises the recommendation if, for example, the number of competitors is much higher than initially assumed.
+
+#### 4.1.3 Example â€“ Pricing Strategy
+
+User question:
+What is an appropriate monthly subscription price for this software-as-a-service product?
+
+Verification questions:
+1. What is the estimated cost to serve each customer per month?
+2. What price ranges do competitors in the same segment charge?
+3. How price-sensitive are target customers likely to be, given their size and alternatives?
+4. What payback period on customer acquisition costs is acceptable?
+
+After answering these, the system may adjust its initial price recommendation or widen the suggested price range.
+
+### 4.2 CoVe with Tools and Retrieval
+
+In production systems, Chain-of-Verification often calls external tools to answer verification questions.
+
+Common tools include:
+
+- Document or database retrieval.
+- Structured search on regulatory or policy databases.
+- Application programming interfaces for financial, weather, or logistics data.
+
+#### 4.2.1 Example â€“ Financial Analysis with Filings
+
+Verification questions are answered by retrieving the companyâ€™s financial filings, investor presentations, and analyst reports, then checking revenue, margins, and debt levels against the original answer. If the original answer contradicts a filing, the verified answer must align with the filing.
+
+#### 4.2.2 Example â€“ Operational Planning with Weather Data
+
+For a logistics plan, verification questions might query weather and traffic data for the planned time window. If weather forecasts show significant disruption risk, the plan is revised and flagged as conditional.
+
+#### 4.2.3 Example â€“ Compliance Checking
+
+For a proposed marketing campaign, verification questions might query a database of regulations and internal policies for prohibited claims. The system revises or rejects copy that conflicts with those rules.
+
+---
+
+## Chapter 5. Metaprompting and Automatic Prompt Optimization
+
+Metaprompting means using a model to design or improve prompts and workflows. Automatic prompt optimization systems extend this idea by treating prompts as programmatic objects that can be tuned using data.
+
+### 5.1 Metaprompting for Prompt Design
+
+Instead of manually crafting every prompt, you describe the task and let the model propose candidate prompts, evaluation criteria, and test cases.
+
+#### 5.1.1 Generic Metaprompt Template
+
+You are an expert in designing prompts for large language model systems.
+
+Task: Design an optimal prompt for [target task and domain].
+
+Constraints:
+- The prompt must specify role, context, task, process, and output format.
+- The prompt must support Chain-of-Verification for high-risk use.
+- The prompt must define how to handle uncertainty and missing data.
+
+Process:
+1. Ask clarifying questions if the task is underspecified.
+2. Propose at least two different prompt variants.
+3. For each variant, describe its strengths, weaknesses, and likely failure modes.
+4. Suggest a simple test harness with example inputs and expected properties.
+
+#### 5.1.2 Example â€“ Sales Email Generator Prompt
+
+Use the metaprompt above with:
+- Target task: Writing first-contact sales emails.
+- Domain: Business-to-business software.
+
+The system returns several candidate prompts, each with different structures and positioning, along with guidance on when each works best.
+
+#### 5.1.3 Example â€“ Workflow Builder for Automation Platform
+
+Target task: Building automation workflows in a no-code platform for small businesses.
+
+The metaprompt can generate system prompts that:
+- Parse user intent.
+- Map it into triggers, actions, and conditions.
+- Return JSON descriptions that your platform can convert into automated workflows.
+
+### 5.2 Programmatic Prompt Optimization (DSPy-Style)
+
+Programmatic prompt optimization treats prompts as code, with:
+
+- A signature that defines inputs and outputs.
+- A training or evaluation dataset.
+- An optimizer that searches for instructions, examples, and structures that maximize a metric such as accuracy.
+
+Case studies from 2024â€“2025 show relative accuracy improvements commonly in the range of twenty to eighty percent on specific tasks. Gains are task-dependent, and some tasks see smaller or negligible improvements. The technique is most effective when you have a clear evaluation function and representative examples.
+
+#### 5.2.1 Example â€“ Question Answering Bot
+
+Define a signature like:
+
+Task: Answer domain-specific questions given a context passage.
+
+Inputs: question, context.
+Output: answer text and confidence score.
+
+You provide a dataset of questions, context passages, and reference answers. The optimizer searches over prompt variants to maximize exact match, F1 score, or another accuracy metric. The final optimized prompt is then used in your production system.
+
+###
